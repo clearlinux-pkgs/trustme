@@ -4,7 +4,7 @@
 #
 Name     : trustme
 Version  : 0.6.0
-Release  : 1
+Release  : 2
 URL      : https://files.pythonhosted.org/packages/76/de/8dc6d402ac6037ee419a4f8bf29b4374068f0517a599234adfcfcc961bc8/trustme-0.6.0.tar.gz
 Source0  : https://files.pythonhosted.org/packages/76/de/8dc6d402ac6037ee419a4f8bf29b4374068f0517a599234adfcfcc961bc8/trustme-0.6.0.tar.gz
 Summary  : #1 quality TLS certs while you wait, for the discerning tester
@@ -15,120 +15,12 @@ Requires: trustme-python = %{version}-%{release}
 Requires: trustme-python3 = %{version}-%{release}
 Requires: cryptography
 Requires: idna
-Requires: ipaddress
 BuildRequires : buildreq-distutils3
 BuildRequires : cryptography
 BuildRequires : idna
-BuildRequires : ipaddress
 
 %description
-.. note that this README gets 'include'ed into the main documentation
-
 ==============================================
- trustme: #1 quality TLS certs while you wait
-==============================================
-
-.. image:: https://vignette2.wikia.nocookie.net/jadensadventures/images/1/1e/Kaa%27s_hypnotic_eyes.jpg/revision/latest?cb=20140310173415
-   :width: 200px
-   :align: right
-
-You wrote a cool network client or server. It encrypts connections
-using `TLS
-<https://en.wikipedia.org/wiki/Transport_Layer_Security>`__. Your test
-suite needs to make TLS connections to itself.
-
-Uh oh. Your test suite *probably* doesn't have a valid TLS
-certificate. Now what?
-
-``trustme`` is a tiny Python package that does one thing: it gives you
-a `fake <https://martinfowler.com/bliki/TestDouble.html>`__
-certificate authority (CA) that you can use to generate fake TLS certs
-to use in your tests. Well, technically they're real certs, they're
-just signed by your CA, which nobody trusts. But you can trust
-it. Trust me.
-
-
-Vital statistics
-================
-
-**Install:** ``pip install -U trustme``
-
-**Documentation:** https://trustme.readthedocs.io
-
-**Bug tracker and source code:** https://github.com/python-trio/trustme
-
-**Tested on:** Python 2.7 and Python 3.5+, CPython and PyPy
-
-**License:** MIT or Apache 2, your choice.
-
-**Code of conduct:** Contributors are requested to follow our `code of
-conduct
-<https://github.com/python-trio/trustme/blob/master/CODE_OF_CONDUCT.md>`__
-in all project spaces.
-
-
-Cheat sheet
-===========
-
-.. code-block:: python
-
-   import trustme
-
-   # ----- Creating certs -----
-
-   # Look, you just created your own certificate authority!
-   ca = trustme.CA()
-
-   # And now you issued a cert signed by this fake CA
-   # https://en.wikipedia.org/wiki/Example.org
-   server_cert = ca.issue_cert(u"test-host.example.org")
-
-   # That's it!
-
-   # ----- Using your shiny new certs -----
-
-   # You can configure SSL context objects to trust this CA:
-   ca.configure_trust(ssl_context)
-   # Or configure them to present the server certificate
-   server_cert.configure_cert(ssl_context)
-   # You can use standard library or PyOpenSSL context objects here,
-   # trustme is happy either way.
-
-   # ----- or -----
-
-   # Save the PEM-encoded data to a file to use in non-Python test
-   # suites:
-   ca.cert_pem.write_to_path("ca.pem")
-   server_cert.private_key_and_cert_chain_pem.write_to_path("server.pem")
-
-   # ----- or -----
-
-   # Put the PEM-encoded data in a temporary file, for libraries that
-   # insist on that:
-   with ca.cert_pem.tempfile() as ca_temp_path:
-       requests.get("https://...", verify=ca_temp_path)
-
-
-FAQ
-===
-
-**Should I use these certs for anything real?** Certainly not.
-
-**Why not just use self-signed certificates?** These are more
-realistic. You don't have to disable your certificate validation code
-in your test suite, which is good, because you want to test what you
-run in production, and you would *never* disable your certificate
-validation code in production, right? Plus they're just as easy to
-work with. Actually easier, in many cases.
-
-**What if I want to test how my code handles some really weird TLS
-configuration?** Sure, I'm happy to extend the API to give more
-control over the generated certificates, at least as long as it
-doesn't turn into a second-rate re-export of everything in
-`cryptography <https://cryptography.io>`__. (If you really need a
-fully general X.509 library then they do a great job at that.) `Let's
-talk <https://github.com/python-trio/trustme/issues/new>`__, or send a
-PR.
 
 %package license
 Summary: license components for the trustme package.
@@ -152,6 +44,8 @@ Summary: python3 components for the trustme package.
 Group: Default
 Requires: python3-core
 Provides: pypi(trustme)
+Requires: pypi(cryptography)
+Requires: pypi(idna)
 
 %description python3
 python3 components for the trustme package.
@@ -166,15 +60,14 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1582906093
-# -Werror is for werrorists
+export SOURCE_DATE_EPOCH=1588358643
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
 export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
-export FCFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
-export FFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FCFLAGS="$FFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FFLAGS="$FFLAGS -O3 -ffat-lto-objects -flto=4 "
 export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=4 "
 export MAKEFLAGS=%{?_smp_mflags}
 python3 setup.py build
@@ -183,6 +76,7 @@ python3 setup.py build
 export MAKEFLAGS=%{?_smp_mflags}
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/trustme
+cp %{_builddir}/trustme-0.6.0/LICENSE %{buildroot}/usr/share/package-licenses/trustme/304509f864a3be91c9528f012a52c5266647cca7
 cp %{_builddir}/trustme-0.6.0/LICENSE.APACHE2 %{buildroot}/usr/share/package-licenses/trustme/2b8b815229aa8a61e483fb4ba0588b8b6c491890
 cp %{_builddir}/trustme-0.6.0/LICENSE.MIT %{buildroot}/usr/share/package-licenses/trustme/f8c5fdc67d412f3435473ee8ce595f06d921ca44
 python3 -tt setup.py build  install --root=%{buildroot}
@@ -196,6 +90,7 @@ echo ----[ mark ]----
 %files license
 %defattr(0644,root,root,0755)
 /usr/share/package-licenses/trustme/2b8b815229aa8a61e483fb4ba0588b8b6c491890
+/usr/share/package-licenses/trustme/304509f864a3be91c9528f012a52c5266647cca7
 /usr/share/package-licenses/trustme/f8c5fdc67d412f3435473ee8ce595f06d921ca44
 
 %files python
