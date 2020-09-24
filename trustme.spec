@@ -4,7 +4,7 @@
 #
 Name     : trustme
 Version  : 0.6.0
-Release  : 3
+Release  : 4
 URL      : https://files.pythonhosted.org/packages/76/de/8dc6d402ac6037ee419a4f8bf29b4374068f0517a599234adfcfcc961bc8/trustme-0.6.0.tar.gz
 Source0  : https://files.pythonhosted.org/packages/76/de/8dc6d402ac6037ee419a4f8bf29b4374068f0517a599234adfcfcc961bc8/trustme-0.6.0.tar.gz
 Summary  : #1 quality TLS certs while you wait, for the discerning tester
